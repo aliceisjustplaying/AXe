@@ -12,7 +12,7 @@
     "environmentVariableEntries" : [
       {
         "key" : "SIMULATOR_UDID",
-        "value" : "B34FF305-5EA8-412B-943F-1D0371CA17FF"
+        "value" : "7C3FA420-5440-4A08-8A66-A7E83F5EADE1"
       }
     ],
     "targetForVariableExpansion" : {

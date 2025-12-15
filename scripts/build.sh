@@ -217,7 +217,7 @@ function resign_framework() {
     find "$framework_path" -name "*.dylib" -type f | while read -r dylib_path; do
       print_info "  Signing dylib: $(basename "$dylib_path")"
       codesign --force \
-        --sign "Developer ID Application: Cameron Cooke (BR6WD3M6ZD)" \
+        --sign "Apple Distribution: Wei Wang (A4YJ9MRZ66)" \
         --options runtime \
         --timestamp \
         --verbose \
@@ -236,7 +236,7 @@ function resign_framework() {
     # Sign the main framework bundle with specific notarization-compatible options
     print_info "Signing main framework bundle: ${framework_name}"
     codesign --force \
-      --sign "Developer ID Application: Cameron Cooke (BR6WD3M6ZD)" \
+      --sign "Apple Distribution: Wei Wang (A4YJ9MRZ66)" \
       --options runtime \
       --entitlements entitlements.plist \
       --timestamp \
@@ -282,7 +282,7 @@ function resign_xcframework() {
 
     # Sign XCFramework with Developer ID and runtime hardening
     codesign --force \
-      --sign "Developer ID Application: Cameron Cooke (BR6WD3M6ZD)" \
+      --sign "Apple Distribution: Wei Wang (A4YJ9MRZ66)" \
       --options runtime \
       --deep \
       --timestamp \
@@ -386,7 +386,7 @@ function sign_axe_executable() {
 
     # Sign with Developer ID and runtime hardening
     codesign --force \
-      --sign "Developer ID Application: Cameron Cooke (BR6WD3M6ZD)" \
+      --sign "Apple Distribution: Wei Wang (A4YJ9MRZ66)" \
       --options runtime \
       --entitlements entitlements.plist \
       --timestamp \

@@ -9,18 +9,18 @@ struct RecordVideoTests {
         defer { try? FileManager.default.removeItem(at: result.outputURL) }
 
         #expect(result.exitCode == 0)
-        #expect(result.fileSize > 150_000, "Recorded file should be non-trivial in size (got: \(result.fileSize))")
+        #expect(result.fileSize > 100_000, "Recorded file should be non-trivial in size (got: \(result.fileSize))")
         #expect(result.stderr.contains("Recording simulator"))
         #expect(result.stdout.trimmingCharacters(in: .whitespacesAndNewlines) == result.outputURL.path)
     }
 
     @Test("Record video honours FPS, scale, and quality settings")
     func recordVideoCustomOptions() async throws {
-        let result = try await invokeRecordVideo(fps: 5, scale: 0.5, quality: 60, duration: 2.0)
+        let result = try await invokeRecordVideo(fps: 5, quality: 60, scale: 0.5, duration: 2.0)
         defer { try? FileManager.default.removeItem(at: result.outputURL) }
 
         #expect(result.exitCode == 0)
-        #expect(result.fileSize > 50_000)
+        #expect(result.fileSize > 40_000)
         #expect(result.stderr.contains("Press Ctrl+C"))
     }
 

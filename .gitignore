@@ -5,6 +5,10 @@
 !*.xcworkspace/xcshareddata/
 !*.xcworkspace/xcshareddata/xcschemes/
 *.xcuserdatad
+!AxePlaygroundApp/AxePlayground.xcodeproj
+!AxePlaygroundApp/AxePlayground.xcodeproj/**
+AxePlaygroundApp/AxePlayground.xcodeproj/xcuserdata/
+AxePlaygroundApp/AxePlayground.xcodeproj/project.xcworkspace/xcuserdata/
 
 # Swift Package Manager
 .build/
@@ -52,4 +56,3 @@ Temporary Items
 /buildServer.json
 build_products/
 build_products/
-
