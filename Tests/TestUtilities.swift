@@ -6,12 +6,17 @@ import Testing
 let defaultSimulatorUDID = ProcessInfo.processInfo.environment["SIMULATOR_UDID"]
 
 struct CommandOutput {
-    let output: String
+    let stdout: String
+    let stderr: String
     let exitCode: Int32
+    
+    var output: String {
+        stdout + (stderr.isEmpty ? "" : "\n\(stderr)")
+    }
 }
 
 struct CommandRunner {
-    static func run(_ command: String) async throws -> (output: String, exitCode: Int32) {
+    static func run(_ command: String) async throws -> CommandOutput {
         let process = Process()
         process.executableURL = URL(fileURLWithPath: "/bin/bash")
         process.arguments = ["-c", command]
@@ -26,10 +31,10 @@ struct CommandRunner {
         
         let outputData = outputPipe.fileHandleForReading.readDataToEndOfFile()
         let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
-        let output = String(data: outputData, encoding: .utf8) ?? ""
-        let error = String(data: errorData, encoding: .utf8) ?? ""
+        let stdout = String(data: outputData, encoding: .utf8) ?? ""
+        let stderr = String(data: errorData, encoding: .utf8) ?? ""
         
-        let combinedOutput = output + (error.isEmpty ? "" : "\n\(error)")
+        let combinedOutput = stdout + (stderr.isEmpty ? "" : "\n\(stderr)")
         
         if process.terminationStatus != 0 {
             throw NSError(
@@ -39,7 +44,7 @@ struct CommandRunner {
             )
         }
         
-        return (combinedOutput, process.terminationStatus)
+        return CommandOutput(stdout: stdout, stderr: stderr, exitCode: process.terminationStatus)
     }
 }
 
@@ -78,7 +83,7 @@ struct UIElement: Codable {
 
 struct UIStateParser {
     static func parseDescribeUIOutput(_ jsonString: String) throws -> UIElement {
-        // The describe-ui command outputs a header "Accessibility Information (JSON):" 
+        // The describe-ui command outputs a header "Accessibility Information (JSON):"
         // followed by the JSON array. We need to extract just the JSON part.
         var jsonContent = jsonString
         
@@ -184,10 +189,11 @@ struct TestHelpers {
         
         // Check if the command failed
         if result.exitCode != 0 {
-            throw TestError.unexpectedState("axe describe-ui command failed with exit code \(result.exitCode). Output: \(result.output)")
+            let output = result.stdout + (result.stderr.isEmpty ? "" : "\n\(result.stderr)")
+            throw TestError.unexpectedState("axe describe-ui command failed with exit code \(result.exitCode). Output: \(output)")
         }
                 
-        return try UIStateParser.parseDescribeUIOutput(result.output)
+        return try UIStateParser.parseDescribeUIOutput(result.stdout)
     }
     
     @discardableResult
@@ -199,14 +205,15 @@ struct TestHelpers {
         
         // Use the built executable directly for faster test execution
         let axePath = try getAxePath()
-        let (output, exitCode) = try await CommandRunner.run("\(axePath) \(fullCommand)")
+        let result = try await CommandRunner.run("\(axePath) \(fullCommand)")
         
         // Check if the command failed
-        if exitCode != 0 {
-            throw TestError.unexpectedState("axe command '\(fullCommand)' failed with exit code \(exitCode). Output: \(output)")
+        if result.exitCode != 0 {
+            let output = result.stdout + (result.stderr.isEmpty ? "" : "\n\(result.stderr)")
+            throw TestError.unexpectedState("axe command '\(fullCommand)' failed with exit code \(result.exitCode). Output: \(output)")
         }
         
-        return CommandOutput(output: output, exitCode: exitCode)
+        return result
     }
 }
 
